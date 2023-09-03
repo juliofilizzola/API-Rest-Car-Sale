@@ -1,8 +1,8 @@
 package com.portal.api.controller;
 
 import com.portal.api.dto.CarPostDTO;
+import com.portal.api.message.KafkaProducerMessage;
 import com.portal.api.service.CarPostStoreService;
-import org.apache.kafka.common.protocol.types.Field;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +15,15 @@ import java.util.List;
 public class CarPostController {
     @Autowired
     private CarPostStoreService carPostStoreService;
+
+    @Autowired
+    private KafkaProducerMessage kafkaProducerMessage;
+
+    @PostMapping("/create")
+    public ResponseEntity postCarForSale(@RequestBody CarPostDTO carPostDTO) {
+        kafkaProducerMessage.sendMessage(carPostDTO);
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
 
     @GetMapping("/posts")
     public ResponseEntity<List<CarPostDTO>> getCarSales() {
